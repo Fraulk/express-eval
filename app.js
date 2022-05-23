@@ -4,8 +4,6 @@ const app = express();
 app.use(express.json())
 
 mongoose.connect('mongodb://localhost:27017/demojs')
-    .then(() => console.log('Connected to mongo'))
-    .catch((err) => console.error('Pas pu se connecter,', err))
 
 const tacheSchema = new mongoose.Schema({
     id: Number,
@@ -41,4 +39,10 @@ app.put('/tache/:id', async (req, res) => {
 
 app.delete('/tache/:id', async (req, res) => res.send(await Tache.deleteOne({id: req.params.id})))
 
-app.listen(3000);
+if (process.env.NODE_ENV !== "test") {
+    app.listen(3000, () => {
+      console.log("listening...");
+    });
+  }
+
+module.exports = {app, Tache}
