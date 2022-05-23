@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
+app.use(express.json())
 
 mongoose.connect('mongodb://localhost:27017/demojs')
     .then(() => console.log('Connected to mongo'))
@@ -13,13 +14,31 @@ const tacheSchema = new mongoose.Schema({
 });
 
 const Tache = mongoose.model('Tache', tacheSchema);
+// const task = new Tache({id: 2, description: "TEST", faite: false})
+// task.save()
 
-app.get('/', (req, res) => { })
+app.get('/tache/:id', async (req, res) => res.send(await Tache.find({id: req.params.id})))
 
-app.post('/', (req, res) => { })
+app.get('/tache', async (req, res) => res.send(await Tache.find()))
 
-app.put('/', (req, res) => { })
+app.post('/tache', async (req, res) => {
+    const tache = new Tache(req.body)
+    let result
+    try {
+        result = await tache.save()
+    } catch (error) {console.log(error)}
+    res.send(result)
+})
 
-app.delete('/', (req, res) => { })
+app.put('/tache/:id', async (req, res) => {
+    const tache = { $set: req.body }
+    let result
+    try {
+        result = await Tache.updateOne({id: req.params.id}, tache)
+    } catch (error) {console.log(error)}
+    res.send()
+})
+
+app.delete('/tache/:id', async (req, res) => res.send(await Tache.deleteOne({id: req.params.id})))
 
 app.listen(3000);
